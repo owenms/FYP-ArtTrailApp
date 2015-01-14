@@ -72,11 +72,12 @@ public class MainActivity extends Activity
                         .show();
                 break;
             case 2:
-                fragment = MyMapFragment.newInstance(position + 1);
+                //fragment = MyMapFragment.newInstance(position + 1);
                 Toast.makeText(getApplicationContext(),"Map pressed", Toast.LENGTH_SHORT)
                         .show();
                 break;
             case 3:
+                fragment = MyOtherMapFragment.newInstance(position + 1);
                 Toast.makeText(getApplicationContext(),"Art pressed", Toast.LENGTH_LONG)
                         .show();
                 break;
