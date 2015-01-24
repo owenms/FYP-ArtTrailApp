@@ -25,7 +25,8 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBhLbaf4uawPILgJe0I3JwIAJ4DpxJU0jA"/>
+            android:value="AIzaSyDyglwakrb48HuRR9vLqa4U5uVHs1TnJT8"/>
+        <!--android:value="AIzaSyBhLbaf4uawPILgJe0I3JwIAJ4DpxJU0jA"/> laptop key-->
 
         <activity
             android:name="ie.ucc.cs1.ojms1.arttrail.MainActivity"

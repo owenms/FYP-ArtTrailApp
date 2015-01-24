@@ -29,10 +29,13 @@ public class MainActivity extends Activity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private boolean navDrawerFix; //TODO: Find better way to fix nav drawer.
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        navDrawerFix = false;
         setContentView(R.layout.activity_main);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -51,6 +54,7 @@ public class MainActivity extends Activity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+        navDrawerFix = true;
     }
 
     @Override
@@ -61,41 +65,40 @@ public class MainActivity extends Activity
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         //TODO: Handle fragment selection here and fix 0 case.
-        Fragment fragment = null;
-        switch(position) {
-            case 0:
-                Toast.makeText(getApplicationContext(), "Case 0", Toast.LENGTH_LONG).show();
-                break;
-            case 1:
-                Toast.makeText(getApplicationContext(),"Home pressed", Toast.LENGTH_LONG)
+        if(navDrawerFix) {
+            Fragment fragment = null;
+            switch (position) {
+                case 0:
+                    Toast.makeText(getApplicationContext(), "Home pressed", Toast.LENGTH_LONG)
+                            .show();
+                    mTitle = getString(R.string.app_name);
+                    break;
+                case 1: //create map fragment
+                    fragment = DisplayMapFragment.newInstance(position + 1);
+                    Toast.makeText(getApplicationContext(), "Map pressed", Toast.LENGTH_SHORT)
+                            .show();
+                    mTitle = getString(R.string.title_section2);
+                    break;
+                case 2:
+                    Toast.makeText(getApplicationContext(), "Art pressed", Toast.LENGTH_LONG)
+                            .show();
+                    mTitle = getString(R.string.title_section3);
+                    break;
+                case 3:
+                    Toast.makeText(getApplicationContext(), "Stats called", Toast.LENGTH_LONG)
+                            .show();
+                    mTitle = getString(R.string.title_section4);
+                    break;
+            }
+            if (fragment != null) {
+                fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .commit();
+            } else {
+                Toast.makeText(getApplicationContext(), "No frag", Toast.LENGTH_LONG)
                         .show();
-                mTitle = getString(R.string.app_name);
-                break;
-            case 2: //create map fragment
-                fragment = DisplayMapFragment.newInstance(position + 1);
-                Toast.makeText(getApplicationContext(),"Map pressed", Toast.LENGTH_SHORT)
-                        .show();
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                Toast.makeText(getApplicationContext(),"Art pressed", Toast.LENGTH_LONG)
-                        .show();
-                mTitle = getString(R.string.title_section3);
-                break;
-            case 4:
-                Toast.makeText(getApplicationContext(),"Stats called", Toast.LENGTH_LONG)
-                        .show();
-                mTitle = getString(R.string.title_section4);
-                break;
-        }
-        if(fragment != null) {
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.container, fragment)
-                    .commit();
-        } else {
-            Toast.makeText(getApplicationContext(),"No frag", Toast.LENGTH_LONG)
-                    .show();
+            }
         }
     }
 
