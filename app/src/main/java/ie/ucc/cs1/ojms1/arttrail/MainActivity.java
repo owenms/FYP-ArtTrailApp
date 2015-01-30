@@ -13,7 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 
@@ -47,6 +50,27 @@ public class MainActivity extends Activity
             public void onClick(View v) {
                 Intent mapActivity = new Intent(MainActivity.this, MapActivity.class);
                 startActivity(mapActivity);
+            }
+        });
+
+
+        //TODO:Remove spinner.
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> spinAdapt = ArrayAdapter.createFromResource(this,
+                                                                               R.array.spinner_example,
+                                                                               android.R.layout.simple_spinner_item);
+        spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinAdapt);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String result = parent.getItemAtPosition(position).toString();
+                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                Toast.makeText(getApplicationContext(), "Nothing Selected", Toast.LENGTH_SHORT).show();
             }
         });
 
