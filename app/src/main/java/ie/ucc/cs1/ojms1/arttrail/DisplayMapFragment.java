@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -33,7 +35,8 @@ import static com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayS
 //TODO: Clean up Toasts
 public class DisplayMapFragment extends Fragment
         implements GoogleMap.OnMapLongClickListener, LocationListener,
-        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
+        ResultCallback<Status>{
 
     //Used for getting and displaying Google Map.
     private MapView mapView;
@@ -118,7 +121,7 @@ public class DisplayMapFragment extends Fragment
                                                                      this);
             requestingLocation = false;
         } else {
-            Toast.makeText(getActivity(), "Not requesting location", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Not requesting location", Toast.LENGTH_SHORT).show();
         }
     }
     @Override
@@ -162,21 +165,22 @@ public class DisplayMapFragment extends Fragment
             Toast.makeText(getActivity(), "From Previous Location", Toast.LENGTH_SHORT).show();
             myCameraUpdater(currLocation);
             LatLng myLoc = new LatLng(currLocation.getLatitude(), currLocation.getLongitude());
-            map.addMarker(new MarkerOptions().position(myLoc).title("Your Location"));
+            map.addMarker(new MarkerOptions().position(myLoc).title("User Location"));
         } else { //begin requesting updates
             Toast.makeText(getActivity(), "Requesting Location Updates", Toast.LENGTH_SHORT).show();
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, //G API client
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, //G.API client
                                                                      mLocRequest, //location request
                                                                      this); //listener
             requestingLocation = false; //prevent any more request locations calls.
         }
         //TODO Create sample geofence
-        mPendIntent = PendingIntent.getService(getActivity(),
+        Intent intent = new Intent(getActivity().getApplicationContext(), GeofenceHandler.class);
+        mPendIntent = PendingIntent.getService(getActivity().getApplicationContext(),
                                                0,
-                                               new Intent(getActivity(), GeofenceHandler.class),
+                                               intent,
                                                PendingIntent.FLAG_UPDATE_CURRENT);
 
-        LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, mGeoRequest, mPendIntent);
+        LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, mGeoRequest, mPendIntent).setResultCallback(this);
     }
 
     @Override
@@ -186,7 +190,7 @@ public class DisplayMapFragment extends Fragment
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        Toast.makeText(getActivity(), "Connection suspended", Toast.LENGTH_SHORT).show();
     }
 
     //------LocationListener methods-------
@@ -230,11 +234,32 @@ public class DisplayMapFragment extends Fragment
         Geofence geofence = new Geofence.Builder().setCircularRegion(51.893040, -8.500363, 30) //WGB UCC
                                                   .setExpirationDuration(Geofence.NEVER_EXPIRE)
                                                   .setLoiteringDelay(5 * 1000) //5 seconds
-                                                  .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL)
+
+                                                  .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                                                                      Geofence.GEOFENCE_TRANSITION_DWELL)
                                                   .setRequestId("WBG UCC")
                                                   .build();
-        geofenceBuilder.addGeofence(geofence);
+
+        Geofence geofence1 = new Geofence.Builder().setCircularRegion(51.994762,-8.387729, 100)//home
+                                                   .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                                                   .setLoiteringDelay(10 * 1000)
+                                                   .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                                                                       Geofence.GEOFENCE_TRANSITION_DWELL)
+                                                   .setRequestId("Home")
+                                                   .build();
+        geofenceBuilder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER)
+                       .addGeofence(geofence)
+                       .addGeofence(geofence1);
         mGeoRequest = geofenceBuilder.build();
         Toast.makeText(getActivity(), "Geofence made", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResult(Status status) {
+        if(status.isSuccess()) {
+            Toast.makeText(getActivity(), "Geofences added successfully", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), "Geofences not added", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -30,6 +30,7 @@ public class GeofenceHandler extends IntentService {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         if(event.hasError()) {
             //TODO: Handle errors here
+            Toast.makeText(getApplicationContext(), "No events triggered", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getApplicationContext(), "Geofence triggered", Toast.LENGTH_SHORT).show();
             int transType = event.getGeofenceTransition();
@@ -44,26 +45,25 @@ public class GeofenceHandler extends IntentService {
     }
 
     private void generateNotification(String locationId, String address) {
-        long when = System.currentTimeMillis();
         Intent notifyIntent = new Intent(this, MainActivity.class);
         notifyIntent.putExtra("id", locationId);
         notifyIntent.putExtra("address", address);
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        long[] vibratePat = {0,500,500,500};
         Notification.Builder builder =
                 new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.ic_drawer)
+                        .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle(locationId)
                         .setContentText(address)
                         .setContentIntent(pendingIntent)
                         .setAutoCancel(true)
-                        .setDefaults(Notification.DEFAULT_SOUND)
-                        .setWhen(when);
+                        .setVibrate(vibratePat)
+                        .setDefaults(Notification.DEFAULT_SOUND);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify("sample", 8080, builder.build());
+        notificationManager.notify(0, builder.getNotification());
     }
 }

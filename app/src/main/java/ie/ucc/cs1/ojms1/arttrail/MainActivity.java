@@ -5,6 +5,9 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,10 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 
@@ -34,6 +34,7 @@ public class MainActivity extends Activity
     private CharSequence mTitle;
     private boolean navDrawerFix; //TODO: Find better way to fix nav drawer.
     private FragmentManager fragmentManager;
+    private Fragment mFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,27 +53,27 @@ public class MainActivity extends Activity
                 startActivity(mapActivity);
             }
         });
-
-
-        //TODO:Remove spinner.
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        ArrayAdapter<CharSequence> spinAdapt = ArrayAdapter.createFromResource(this,
-                                                                               R.array.spinner_example,
-                                                                               android.R.layout.simple_spinner_item);
-        spinAdapt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinAdapt);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        Button artButton = (Button) findViewById(R.id.artButton);
+        artButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String result = parent.getItemAtPosition(position).toString();
-                Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                Toast.makeText(getApplicationContext(), "Nothing Selected", Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                int id = (int) System.currentTimeMillis();
+                Intent mapActivity = new Intent(MainActivity.this, MapActivity.class);
+                PendingIntent pendIntent = PendingIntent.getActivity(getApplicationContext(), 0, mapActivity, PendingIntent.FLAG_UPDATE_CURRENT);
+                Notification notif = new Notification.Builder(getApplicationContext())
+                        .setContentIntent(pendIntent)
+                        .setTicker("Sample Ticker Text")
+                        .setContentText("Sample Content Text")
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("Sample Content Title")
+                        .setVibrate(new long[]{0,100,100,100})
+                        .setAutoCancel(true)
+                        .getNotification();
+                NotificationManager notifMan = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                notifMan.notify(id, notif);
             }
         });
+
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -84,13 +85,11 @@ public class MainActivity extends Activity
     @Override
     public void onResume() {
         super.onResume();
-        //TODO: Check for Google Play Services here?
     }
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         //TODO: Handle fragment selection here and fix 0 case.
         if(navDrawerFix) {
-            Fragment fragment = null;
             switch (position) {
                 case 0:
                     Toast.makeText(getApplicationContext(), "Home pressed", Toast.LENGTH_LONG)
@@ -98,26 +97,30 @@ public class MainActivity extends Activity
                     mTitle = getString(R.string.app_name);
                     break;
                 case 1: //create map fragment
-                    fragment = DisplayMapFragment.newInstance(position + 1);
+                    mFragment = DisplayMapFragment.newInstance(position + 1);
                     Toast.makeText(getApplicationContext(), "Map pressed", Toast.LENGTH_SHORT)
                             .show();
                     mTitle = getString(R.string.title_section2);
+
                     break;
                 case 2:
                     Toast.makeText(getApplicationContext(), "Art pressed", Toast.LENGTH_LONG)
                             .show();
                     mTitle = getString(R.string.title_section3);
+
                     break;
                 case 3:
                     Toast.makeText(getApplicationContext(), "Stats called", Toast.LENGTH_LONG)
                             .show();
                     mTitle = getString(R.string.title_section4);
+
                     break;
             }
-            if (fragment != null) {
+            if (mFragment != null) {
                 fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction()
-                        .replace(R.id.container, fragment)
+                        .replace(R.id.container, mFragment)
+                        .addToBackStack(null)
                         .commit();
             } else {
                 Toast.makeText(getApplicationContext(), "No frag", Toast.LENGTH_LONG)
