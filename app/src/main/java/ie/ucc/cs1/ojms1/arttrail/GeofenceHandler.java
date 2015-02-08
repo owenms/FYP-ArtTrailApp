@@ -31,15 +31,22 @@ public class GeofenceHandler extends IntentService {
         if(event.hasError()) {
             //TODO: Handle errors here
             Toast.makeText(getApplicationContext(), "No events triggered", Toast.LENGTH_SHORT).show();
+            generateNotification("Geofence error", "Error handling geofences");
         } else {
             Toast.makeText(getApplicationContext(), "Geofence triggered", Toast.LENGTH_SHORT).show();
             int transType = event.getGeofenceTransition();
-            if(transType == Geofence.GEOFENCE_TRANSITION_ENTER ||
-               transType == Geofence.GEOFENCE_TRANSITION_DWELL) {
+            if(transType == Geofence.GEOFENCE_TRANSITION_ENTER) {
                 List<Geofence> geofenceTriggered = event.getTriggeringGeofences();
                 for(Geofence geofence : geofenceTriggered) {
-                    generateNotification(geofence.getRequestId(), "Geofence Triggered!");
+                    generateNotification(geofence.getRequestId(), "Geofence Enter!");
                 }
+            } else if (transType == Geofence.GEOFENCE_TRANSITION_DWELL){
+                List<Geofence> geofenceTriggered = event.getTriggeringGeofences();
+                for(Geofence geofence : geofenceTriggered) {
+                    generateNotification(geofence.getRequestId(), "Geofence Dwell!");
+                }
+            } else {
+                generateNotification("Leaving Geofence", "You have just left a geofence area");
             }
         }
     }
@@ -49,7 +56,7 @@ public class GeofenceHandler extends IntentService {
         notifyIntent.putExtra("id", locationId);
         notifyIntent.putExtra("address", address);
         notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
+        int id = (int) System.currentTimeMillis();
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         long[] vibratePat = {0,500,500,500};
         Notification.Builder builder =
@@ -64,6 +71,6 @@ public class GeofenceHandler extends IntentService {
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, builder.getNotification());
+        notificationManager.notify(id, builder.getNotification());
     }
 }

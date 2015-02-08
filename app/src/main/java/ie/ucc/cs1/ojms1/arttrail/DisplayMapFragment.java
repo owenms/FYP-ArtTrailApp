@@ -43,14 +43,12 @@ public class DisplayMapFragment extends Fragment
     private GoogleMap map;
 
     private Location currLocation;
-    private Location lastLocation;
 
     //Google Play Services provider
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocRequest;
     private GeofencingRequest mGeoRequest;
     private boolean requestingLocation;
-
     private PendingIntent mPendIntent;
 
     public static DisplayMapFragment newInstance(int position) {
@@ -204,7 +202,7 @@ public class DisplayMapFragment extends Fragment
             String markerTitle = latitude + ", " + longitude;
             myCameraUpdater(location);
             map.clear();
-            map.addCircle(new CircleOptions().center(new LatLng(51.893040, -8.500363)) //wgb
+            map.addCircle(new CircleOptions().center(new LatLng(51.994762,-8.387729)) //wgb
                     .radius(30)
                     .visible(true));
             map.addMarker(new MarkerOptions().position(myLatLng).title(markerTitle));
@@ -240,7 +238,7 @@ public class DisplayMapFragment extends Fragment
                                                   .setRequestId("WBG UCC")
                                                   .build();
 
-        Geofence geofence1 = new Geofence.Builder().setCircularRegion(51.994762,-8.387729, 100)//home
+        Geofence geofence1 = new Geofence.Builder().setCircularRegion(51.994762,-8.387729, 30)//home
                                                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
                                                    .setLoiteringDelay(10 * 1000)
                                                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
