@@ -1,29 +1,27 @@
 package ie.ucc.cs1.ojms1.arttrail;
 
+import android.app.DownloadManager;
+import android.content.Context;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by owen on 08/02/2015.
  */
-public class DirectionsAPIHelper {
-    @SerializedName("Directions_URL")
+public class DirectionsAPIHelper implements Response.Listener<String>{
     private static String DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/json?";
-    @SerializedName("origin")
     private final String origin;
-    @SerializedName("destination")
     private final String destination;
-//    private final String apiKey;
-//    private final String travelMode;
-//
-//    private DirectionsAPIHelper(final String origin, final String destination,
-//                                final String apiKey, final String travelMode) {
-//        this.origin = origin;
-//        this.destination = destination;
-//        this.apiKey = apiKey;
-//        this.travelMode = travelMode;
-//    }
+    private Gson gson;
+    private RequestQueue queue;
 
     private DirectionsAPIHelper(final String origin, final String destination) {
         this.origin = origin;
@@ -38,25 +36,29 @@ public class DirectionsAPIHelper {
         return origin;
     }
 
-//    public String getApiKey() {
-//        return apiKey;
-//    }
-//    public String getTravelMode() {
-//        return travelMode;
-//    }
-//    private String createJSONRequest() {
-////        String result = DIRECTIONS_URL+"origin="+getOrigin()+"&"+
-////                        "destination="+getDestination();
-//
-////        return result;
-//        return gson.toJson(this);
-//    }
+    private void createJSONRequest(final Context context) {
+        queue = Volley.newRequestQueue(context);
+        String url = DIRECTIONS_URL+"origin="+getOrigin()+"&"+
+                        "destination="+getDestination();
+        StringRequest directionsApiCall =
+                new StringRequest(Request.Method.GET, url, this, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, "Unable to create Directions API Request", Toast.LENGTH_SHORT)
+                     .show();
+            }
+        });
+        queue.add(directionsApiCall);
+    }
+
     private void displayRoute(GoogleMap map) {
 
     }
-    public static void main(String[] args) {
-        DirectionsAPIHelper dah = new DirectionsAPIHelper("Home", "Work");
-        Gson gson = new Gson();
-        System.out.println(gson.toJson(dah));
+
+    @Override
+    public void onResponse(String s) {
+        //TODO: Use GSON to decode JSON response and draw route to map.
+        gson = new Gson();
+
     }
 }
