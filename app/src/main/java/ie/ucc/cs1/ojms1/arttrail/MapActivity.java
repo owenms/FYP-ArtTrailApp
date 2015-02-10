@@ -8,29 +8,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 
-public class MapActivity extends Activity {
+public class MapActivity extends Activity implements GoogleMap.OnMapLongClickListener {
 
-    private TextView mView;
+    private GoogleMap map;
+    private LatLng home;
+    private LatLng wgb;
+    private DirectionsAPIHelper directionsAPIHelper;
 
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_map);
-//        mView = (TextView) findViewById(R.id.displayMessage);
-//        Button mButton = (Button) findViewById(R.id.backButton);
-//        mButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                finish();
-//            }
-//        });
-//    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        home = new LatLng(51.994762,-8.387729);
+        wgb = new LatLng(51.893040, -8.500363);
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.activityMap);
+        map = mapFragment.getMap();
+        map.setOnMapLongClickListener(this);
+        map.addMarker(new MarkerOptions().position(new LatLng(0,0)));
     }
 
 
@@ -54,5 +57,12 @@ public class MapActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        Toast.makeText(getApplicationContext(), "Long Click", Toast.LENGTH_SHORT).show();
+        directionsAPIHelper = new DirectionsAPIHelper(home, wgb);
+        directionsAPIHelper.createJSONRequest(this.getApplicationContext());
     }
 }
