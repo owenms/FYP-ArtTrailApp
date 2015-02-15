@@ -2,7 +2,9 @@ package ie.ucc.cs1.ojms1.arttrail;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +16,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 
 public class MapActivity extends Activity implements GoogleMap.OnMapLongClickListener {
@@ -33,7 +36,6 @@ public class MapActivity extends Activity implements GoogleMap.OnMapLongClickLis
                 .findFragmentById(R.id.activityMap);
         map = mapFragment.getMap();
         map.setOnMapLongClickListener(this);
-        map.addMarker(new MarkerOptions().position(new LatLng(0,0)));
     }
 
 
@@ -62,7 +64,7 @@ public class MapActivity extends Activity implements GoogleMap.OnMapLongClickLis
     @Override
     public void onMapLongClick(LatLng latLng) {
         Toast.makeText(getApplicationContext(), "Long Click", Toast.LENGTH_SHORT).show();
-        directionsAPIHelper = new DirectionsAPIHelper(home, wgb);
-        directionsAPIHelper.createJSONRequest(this.getApplicationContext());
+        directionsAPIHelper = new DirectionsAPIHelper(home, latLng, map);
+        directionsAPIHelper.sendDirectionsAPIRequest(this.getApplicationContext());
     }
 }
