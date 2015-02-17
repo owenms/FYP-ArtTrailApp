@@ -31,10 +31,10 @@
             android:value="AIzaSyDdS_XKJjiUam4TKLzes1KPcn4sHrvTolI"/> <!--laptop key-->
             <!--android:value="AIzaSyDyglwakrb48HuRR9vLqa4U5uVHs1TnJT8"/>-->
 
-        <!--<service-->
-            <!--android:name="com.estimote.sdk.service.BeaconService"-->
-            <!--android:exported="false">-->
-        <!--</service>-->
+        <service
+            android:name="com.estimote.sdk.service.BeaconService"
+            android:exported="false">
+        </service>
         <service android:name=".GeofenceHandler"/>
         <activity
             android:name="ie.ucc.cs1.ojms1.arttrail.MainActivity"
