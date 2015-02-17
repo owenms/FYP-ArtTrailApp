@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ArtTrailApp.iml" filepath="$PROJECT_DIR$/ArtTrailApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FYP-ArtTrailApp.iml" filepath="$PROJECT_DIR$/FYP-ArtTrailApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

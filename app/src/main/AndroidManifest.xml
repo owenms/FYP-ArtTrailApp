@@ -28,12 +28,13 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDdS_XKJjiUam4TKLzes1KPcn4sHrvTolI" /> <!-- laptop key -->
-        <!-- android:value="AIzaSyDyglwakrb48HuRR9vLqa4U5uVHs1TnJT8"/> -->
+            android:value="AIzaSyDyglwakrb48HuRR9vLqa4U5uVHs1TnJT8" /> <!-- pc key -->
+        <!-- android:value="AIzaSyDdS_XKJjiUam4TKLzes1KPcn4sHrvTolI" /> -->
+        <!-- laptop key -->
 
-
-        <service android:name="com.estimote.sdk.service.BeaconService"
-            android:exported="false"/>
+        <service
+            android:name="com.estimote.sdk.service.BeaconService"
+            android:exported="false" />
         <service android:name=".GeofenceHandler" />
 
         <activity
@@ -48,6 +49,10 @@
         <activity
             android:name=".MapActivity"
             android:label="@string/title_activity_map" >
+        </activity>
+        <activity
+            android:name=".BeaconActivity"
+            android:label="@string/title_activity_beacon" >
         </activity>
     </application>
 

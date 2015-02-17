@@ -1,21 +1,17 @@
 package ie.ucc.cs1.ojms1.arttrail;
 
-import android.app.Activity;
-
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -57,20 +53,22 @@ public class MainActivity extends Activity
         artButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int id = (int) System.currentTimeMillis();
-                Intent mapActivity = new Intent(MainActivity.this, MapActivity.class);
-                PendingIntent pendIntent = PendingIntent.getActivity(getApplicationContext(), 0, mapActivity, PendingIntent.FLAG_UPDATE_CURRENT);
-                Notification notif = new Notification.Builder(getApplicationContext())
-                        .setContentIntent(pendIntent)
-                        .setTicker("Sample Ticker Text")
-                        .setContentText("Sample Content Text")
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("Sample Content Title")
-                        .setVibrate(new long[]{0,100,100,100})
-                        .setAutoCancel(true)
-                        .getNotification();
-                NotificationManager notifMan = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                notifMan.notify(id, notif);
+//                int id = (int) System.currentTimeMillis();
+//                Intent mapActivity = new Intent(MainActivity.this, MapActivity.class);
+//                PendingIntent pendIntent = PendingIntent.getActivity(getApplicationContext(), 0, mapActivity, PendingIntent.FLAG_UPDATE_CURRENT);
+//                Notification notif = new Notification.Builder(getApplicationContext())
+//                        .setContentIntent(pendIntent)
+//                        .setTicker("Sample Ticker Text")
+//                        .setContentText("Sample Content Text")
+//                        .setSmallIcon(R.drawable.ic_launcher)
+//                        .setContentTitle("Sample Content Title")
+//                        .setVibrate(new long[]{0,100,100,100})
+//                        .setAutoCancel(true)
+//                        .getNotification();
+//                NotificationManager notifMan = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//                notifMan.notify(id, notif);
+                Intent beaconActivity = new Intent(MainActivity.this, BeaconActivity.class);
+                startActivity(beaconActivity);
             }
         });
 

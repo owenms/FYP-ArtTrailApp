@@ -178,7 +178,8 @@ public class DisplayMapFragment extends Fragment
                                                intent,
                                                PendingIntent.FLAG_UPDATE_CURRENT);
 
-        LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, mGeoRequest, mPendIntent).setResultCallback(this);
+        LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, mGeoRequest, mPendIntent)
+                                      .setResultCallback(this);
     }
 
     @Override
