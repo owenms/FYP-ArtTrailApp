@@ -204,7 +204,10 @@ public class DisplayMapFragment extends Fragment
             myCameraUpdater(location);
             map.clear();
             map.addCircle(new CircleOptions().center(new LatLng(51.994762,-8.387729)) //wgb
-                    .radius(30)
+                    .radius(100)
+                    .visible(true));
+            map.addCircle(new CircleOptions().center(new LatLng(51.893040, -8.500363)) //wgb
+                    .radius(100)
                     .visible(true));
             map.addMarker(new MarkerOptions().position(myLatLng).title(markerTitle));
         }
@@ -230,7 +233,7 @@ public class DisplayMapFragment extends Fragment
 
     private void createGeofenceRequest() {
         GeofencingRequest.Builder geofenceBuilder = new GeofencingRequest.Builder();
-        Geofence geofence = new Geofence.Builder().setCircularRegion(51.893040, -8.500363, 30) //WGB UCC
+        Geofence geofence = new Geofence.Builder().setCircularRegion(51.893040, -8.500363, 100) //WGB UCC
                                                   .setExpirationDuration(Geofence.NEVER_EXPIRE)
                                                   .setLoiteringDelay(5 * 1000) //5 seconds
 
@@ -239,7 +242,7 @@ public class DisplayMapFragment extends Fragment
                                                   .setRequestId("WBG UCC")
                                                   .build();
 
-        Geofence geofence1 = new Geofence.Builder().setCircularRegion(51.994762,-8.387729, 30)//home
+        Geofence geofence1 = new Geofence.Builder().setCircularRegion(51.994762,-8.387729, 100)//home
                                                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
                                                    .setLoiteringDelay(10 * 1000)
                                                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |

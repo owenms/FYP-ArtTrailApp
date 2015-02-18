@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
+import com.estimote.sdk.Utils;
 
 import java.util.List;
 
@@ -25,7 +26,6 @@ public class BeaconActivity extends Activity {
     private Region allBeacons = new Region("MyBeacons", MY_UUID, null, null);
 
     private BeaconManager beaconManager;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +45,13 @@ public class BeaconActivity extends Activity {
                     count++;
                     int major = beacon.getMajor();
                     int minor = beacon.getMinor();
+                    String text = ""+beacon.getRssi();
                     if(major == 11492 && minor == 17761) {
-                        blueberryPie.setText("In range");
+                        blueberryPie.setText(text);
                     } else if(major == 24770 && minor == 63730) {
-                        mintCocktail.setText("In range");
+                        mintCocktail.setText(text);
                     } else if(major == 36992 && minor == 9494) {
-                        icyMarshmallow.setText("In range");
+                        icyMarshmallow.setText(text);
                     }
                 }
                 beaconCount.setText(""+count);
