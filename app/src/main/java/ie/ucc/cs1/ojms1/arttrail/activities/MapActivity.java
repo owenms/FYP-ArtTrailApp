@@ -1,22 +1,17 @@
-package ie.ucc.cs1.ojms1.arttrail;
+package ie.ucc.cs1.ojms1.arttrail.activities;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
+
+import ie.ucc.cs1.ojms1.arttrail.R;
+import ie.ucc.cs1.ojms1.arttrail.helpers.DirectionsAPIHelper;
 
 
 public class MapActivity extends Activity implements GoogleMap.OnMapLongClickListener {
@@ -30,6 +25,7 @@ public class MapActivity extends Activity implements GoogleMap.OnMapLongClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
         home = new LatLng(51.994762,-8.387729);
         wgb = new LatLng(51.893040, -8.500363);
         MapFragment mapFragment = (MapFragment) getFragmentManager()

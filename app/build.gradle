@@ -27,5 +27,4 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
     compile files('/libs/volley.jar')
     compile files('/libs/estimote-sdk-preview.jar')
-    compile files('C:/Users/owen/AndroidStudioProjects/ArtTrailApp/libs/volley.jar')
 }

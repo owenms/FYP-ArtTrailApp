@@ -1,4 +1,4 @@
-package ie.ucc.cs1.ojms1.arttrail;
+package ie.ucc.cs1.ojms1.arttrail.helpers;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public class DirectionsAPIResponse {
     @SerializedName("routes")
-    public DirectionsRoute[] route;
+    public DirectionsAPIRoute[] route;
     public DirectionsAPIResponse() {}
 
 }

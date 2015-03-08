@@ -1,4 +1,4 @@
-package ie.ucc.cs1.ojms1.arttrail;
+package ie.ucc.cs1.ojms1.arttrail.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -14,6 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+
+import ie.ucc.cs1.ojms1.arttrail.fragments.ArtListFragment;
+import ie.ucc.cs1.ojms1.arttrail.fragments.MapFragment;
+import ie.ucc.cs1.ojms1.arttrail.fragments.NavigationDrawerFragment;
+import ie.ucc.cs1.ojms1.arttrail.R;
 
 
 public class MainActivity extends Activity
@@ -53,31 +58,27 @@ public class MainActivity extends Activity
         artButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                int id = (int) System.currentTimeMillis();
-//                Intent mapActivity = new Intent(MainActivity.this, MapActivity.class);
-//                PendingIntent pendIntent = PendingIntent.getActivity(getApplicationContext(), 0, mapActivity, PendingIntent.FLAG_UPDATE_CURRENT);
-//                Notification notif = new Notification.Builder(getApplicationContext())
-//                        .setContentIntent(pendIntent)
-//                        .setTicker("Sample Ticker Text")
-//                        .setContentText("Sample Content Text")
-//                        .setSmallIcon(R.drawable.ic_launcher)
-//                        .setContentTitle("Sample Content Title")
-//                        .setVibrate(new long[]{0,100,100,100})
-//                        .setAutoCancel(true)
-//                        .getNotification();
-//                NotificationManager notifMan = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//                notifMan.notify(id, notif);
                 Intent beaconActivity = new Intent(MainActivity.this, BeaconActivity.class);
                 startActivity(beaconActivity);
             }
         });
 
-
         // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+        mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
+                                        (DrawerLayout) findViewById(R.id.drawer_layout));
         navDrawerFix = true;
+        Intent intent = getIntent();
+        int id = intent.getIntExtra("NOTICATION_TYPE", 0);
+        if(id == 1) { //Beacon intent
+            startActivity(new Intent(this, BeaconActivity.class));
+        } else if(id == 2) { //Geofence intent
+            mFragment = new MapFragment();
+            fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                           .add(R.id.container, mFragment)
+                           .addToBackStack(null)
+                           .commit();
+        }
     }
 
     @Override
@@ -88,24 +89,23 @@ public class MainActivity extends Activity
     public void onNavigationDrawerItemSelected(int position) {
         //TODO: Handle fragment selection here and fix 0 case.
         if(navDrawerFix) {
+            boolean homePressed = false;
             switch (position) {
                 case 0:
-                    Toast.makeText(getApplicationContext(), "Home pressed", Toast.LENGTH_LONG)
-                            .show();
+                    homePressed = true;
                     mTitle = getString(R.string.app_name);
                     break;
                 case 1: //create map fragment
-                    mFragment = DisplayMapFragment.newInstance(position + 1);
+                    mFragment = MapFragment.newInstance(position + 1);
                     Toast.makeText(getApplicationContext(), "Map pressed", Toast.LENGTH_SHORT)
                             .show();
                     mTitle = getString(R.string.title_section2);
-
                     break;
                 case 2:
+                    mFragment = ArtListFragment.newInstance(position + 1);
                     Toast.makeText(getApplicationContext(), "Art pressed", Toast.LENGTH_LONG)
                             .show();
                     mTitle = getString(R.string.title_section3);
-
                     break;
                 case 3:
                     Toast.makeText(getApplicationContext(), "Stats called", Toast.LENGTH_LONG)
@@ -116,13 +116,16 @@ public class MainActivity extends Activity
             }
             if (mFragment != null) {
                 fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, mFragment)
-                        .addToBackStack(null)
-                        .commit();
-            } else {
-                Toast.makeText(getApplicationContext(), "No frag", Toast.LENGTH_LONG)
-                        .show();
+                if(homePressed) { //close current fragment
+                    fragmentManager.beginTransaction()
+                                   .remove(mFragment)
+                                   .commit();
+                } else { //open new fragment
+                    fragmentManager.beginTransaction()
+                                   .replace(R.id.container, mFragment)
+                                   .addToBackStack(null)
+                                   .commit();
+                }
             }
         }
     }

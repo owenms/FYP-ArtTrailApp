@@ -4,7 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="ie.ucc.cs1.ojms1.arttrail.BeaconActivity">
+    tools:context="ie.ucc.cs1.ojms1.arttrail.activities.BeaconActivity">
 
     <TextView android:text="Blueberry Pie:" android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -75,5 +75,23 @@
         android:layout_below="@+id/textView4"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Ranging"
+        android:id="@+id/rangingButton"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/beaconCount"
+        android:layout_toEndOf="@+id/beaconCount" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Monitoring"
+        android:id="@+id/monitoringButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package ie.ucc.cs1.ojms1.arttrail;
+package ie.ucc.cs1.ojms1.arttrail.helpers;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -12,7 +12,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 
@@ -25,13 +24,14 @@ import java.util.List;
 public class DirectionsAPIHelper {
     //TODO: Handle Volley Timeout and Retry
     private final static String DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/json?";
-    private final LatLng origin;
-    private final LatLng destination;
+    private LatLng origin;
+    private LatLng destination;
     private Gson gson;
     private RequestQueue queue;
     public List<LatLng> points;
     private GoogleMap map;
 
+    public DirectionsAPIHelper() {}
     public DirectionsAPIHelper(final LatLng origin, final LatLng destination, GoogleMap map) {
         this.origin = origin;
         this.destination = destination;
@@ -44,6 +44,14 @@ public class DirectionsAPIHelper {
 
     public String getOrigin() {
         return ""+origin.latitude+","+origin.longitude;
+    }
+
+    public void setOrigin(LatLng location) {
+            this.origin = location;
+    }
+
+    public void setDestination(LatLng location) {
+        this.destination = location;
     }
 
     public void sendDirectionsAPIRequest(final Context context) {
