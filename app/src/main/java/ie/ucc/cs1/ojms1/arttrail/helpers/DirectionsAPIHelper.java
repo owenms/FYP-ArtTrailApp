@@ -89,6 +89,7 @@ public class DirectionsAPIHelper {
         gson = new Gson();
         DirectionsAPIResponse route = gson.fromJson(s, DirectionsAPIResponse.class);
         String encodedOverviewPolyline = route.route[0].overview_polyline.points;
+        Log.d("LINE", encodedOverviewPolyline);
         points = decodeOverviewPolyline(encodedOverviewPolyline);
         displayRoute();
     }
