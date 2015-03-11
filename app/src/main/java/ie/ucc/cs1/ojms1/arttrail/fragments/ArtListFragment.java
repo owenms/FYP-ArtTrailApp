@@ -8,10 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import ie.ucc.cs1.ojms1.arttrail.ArtListViewAdapter;
-import ie.ucc.cs1.ojms1.arttrail.DatabaseHandler;
+import ie.ucc.cs1.ojms1.arttrail.adapters.ArtListViewAdapter;
+import ie.ucc.cs1.ojms1.arttrail.helpers.DatabaseHandler;
 import ie.ucc.cs1.ojms1.arttrail.R;
 
 public class ArtListFragment extends Fragment {
@@ -50,8 +49,9 @@ public class ArtListFragment extends Fragment {
         artListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor)parent.getItemAtPosition(position);
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 int artId = cursor.getInt(cursor.getColumnIndex(db.ART_ID));
+                cursor.close();
                 FragmentManager fm = getFragmentManager();
                 fm.beginTransaction()
                   .replace(R.id.container, ArtDetailsFragment.newInstance(artId))

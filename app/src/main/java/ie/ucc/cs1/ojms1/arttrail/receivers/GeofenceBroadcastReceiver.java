@@ -1,11 +1,9 @@
 package ie.ucc.cs1.ojms1.arttrail.receivers;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,13 +12,13 @@ import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.List;
 
-import ie.ucc.cs1.ojms1.arttrail.R;
-import ie.ucc.cs1.ojms1.arttrail.activities.MainActivity;
+import ie.ucc.cs1.ojms1.arttrail.helpers.DatabaseHandler;
 import ie.ucc.cs1.ojms1.arttrail.helpers.NotificationHandler;
 
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
     private NotificationHandler notificationHandler;
+    private DatabaseHandler db;
 
     public GeofenceBroadcastReceiver() {
     }
@@ -28,7 +26,8 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         notificationHandler = new NotificationHandler(context);
-        Log.d("GEOFENCE)B_CAST", "Geofence B_Cast onReceive called");
+        db = new DatabaseHandler(context, null);
+        Log.d("GEOFENCE B_CAST", "Geofence B_Cast onReceive called");
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         if(event.hasError()) {
             //TODO Handle error
@@ -40,12 +39,10 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
             if(transType == Geofence.GEOFENCE_TRANSITION_ENTER) {
                 List<Geofence> geofenceTriggered = event.getTriggeringGeofences();
                 for(Geofence geofence : geofenceTriggered) {
-                    notificationHandler.createGeofenceNotification(geofence.getRequestId(),"Geofence Enter");
-                }
-            } else if (transType == Geofence.GEOFENCE_TRANSITION_DWELL){
-                List<Geofence> geofenceTriggered = event.getTriggeringGeofences();
-                for(Geofence geofence : geofenceTriggered) {
-                    notificationHandler.createGeofenceNotification(geofence.getRequestId(),"Geofence Dwell!");
+                    Cursor cursor = db.getArtIdFromName(geofence.getRequestId());
+                    int artId = cursor.getInt(cursor.getColumnIndex(db.ART_ID));
+                    cursor.close();
+                    notificationHandler.createGeofenceNotification(artId, geofence.getRequestId(),"Art");
                 }
             }
         }

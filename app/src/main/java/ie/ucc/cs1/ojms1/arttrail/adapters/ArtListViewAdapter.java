@@ -1,16 +1,16 @@
-package ie.ucc.cs1.ojms1.arttrail;
+package ie.ucc.cs1.ojms1.arttrail.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import ie.ucc.cs1.ojms1.arttrail.R;
+import ie.ucc.cs1.ojms1.arttrail.helpers.DatabaseHandler;
 
 /**
  * Created by owen on 26/02/2015.

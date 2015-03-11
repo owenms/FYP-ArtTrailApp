@@ -1,4 +1,4 @@
-package ie.ucc.cs1.ojms1.arttrail;
+package ie.ucc.cs1.ojms1.arttrail.helpers;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.content.Context;
 import android.content.ContentValues;
 import android.util.Log;
+
+import ie.ucc.cs1.ojms1.arttrail.R;
 
 public class DatabaseHandler extends SQLiteOpenHelper{
 
@@ -77,7 +79,9 @@ public class DatabaseHandler extends SQLiteOpenHelper{
                 ");";
         db.execSQL(createGeofenceTable);
 
-        insertSampleData(db);
+        insertSampleDataIntoArtTable(db);
+        insertSampleDataIntoGeofenceTable(db);
+        insertSampleDataIntoBeaconTable(db);
     }
 
     @Override
@@ -86,7 +90,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         onCreate(db);
     }
 
-    private void insertSampleData(SQLiteDatabase db) {
+    private void insertSampleDataIntoArtTable(SQLiteDatabase db) {
         ContentValues values1 = new ContentValues();
         values1.put(ART_NAME, "Iron Giant");
         values1.put(ART_ARTIST, "Owen McSweeney");
@@ -106,7 +110,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         values2.put(ART_VISITED, 0);
 
         ContentValues values3 = new ContentValues();
-        values3.put(ART_NAME, "Girl With The Pearl Earring Painting");
+        values3.put(ART_NAME, "Girl With The Pearl Earring");
         values3.put(ART_ARTIST, "Johannes Vermeer");
         values3.put(ART_INFO, "Portrait of a girl with a pearl earring. Note the pearl earring.");
         values3.put(ART_PIC, R.drawable.pearl_earring);
@@ -140,6 +144,60 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
     }
 
+    private void insertSampleDataIntoGeofenceTable(SQLiteDatabase db) {
+        ContentValues values1 = new ContentValues();
+        values1.put(GEOFENCE_LAT, 51.994762);
+        values1.put(GEOFENCE_LONG, -8.387729);
+        values1.put(GEOFENCE_RADIUS, 100);
+        values1.put(GEOFENCE_ART_ID, 1); //Home
+
+        ContentValues values2 = new ContentValues();
+        values2.put(GEOFENCE_LAT, 51.893040);
+        values2.put(GEOFENCE_LONG, -8.500363);
+        values2.put(GEOFENCE_RADIUS, 100);
+        values2.put(GEOFENCE_ART_ID, 2); //WGB UCC
+
+        ContentValues values3 = new ContentValues();
+        values3.put(GEOFENCE_LAT, 51.8955202);
+        values3.put(GEOFENCE_LONG, -8.48896);
+        values3.put(GEOFENCE_RADIUS, 30);
+        values3.put(GEOFENCE_ART_ID, 3); //Main Gates UCC
+
+        ContentValues values4 = new ContentValues();
+        values4.put(GEOFENCE_LAT, 51.901468);
+        values4.put(GEOFENCE_LONG, -8.463639);
+        values4.put(GEOFENCE_RADIUS, 100);
+        values4.put(GEOFENCE_ART_ID, 4); //St. Patrick's Church
+
+        ContentValues values5 = new ContentValues();
+        values5.put(GEOFENCE_LAT, 51.897379);
+        values5.put(GEOFENCE_LONG, -8.465723);
+        values5.put(GEOFENCE_RADIUS, 30);
+        values5.put(GEOFENCE_ART_ID, 5); //City Hall
+
+        db.insert(TABLE_GEOFENCE, null, values1);
+        db.insert(TABLE_GEOFENCE, null, values2);
+        db.insert(TABLE_GEOFENCE, null, values3);
+        db.insert(TABLE_GEOFENCE, null, values4);
+        db.insert(TABLE_GEOFENCE, null, values5);
+    }
+
+    private void insertSampleDataIntoBeaconTable(SQLiteDatabase db) {
+        ContentValues values1 = new ContentValues();
+        values1.put(BEACON_MAJOR, 11492); //blueberry pie
+        values1.put(BEACON_MINOR, 17761); //blueberry pie
+        values1.put(BEACON_ART_ID, 1);
+
+        ContentValues values2 = new ContentValues();
+        values2.put(BEACON_MAJOR, 24770); //mint cocktail
+        values2.put(BEACON_MINOR, 63730); //mint cocktail
+        values2.put(BEACON_ART_ID, 1);
+        values2.put(BEACON_AD, "Your next purchase can be reduced by 20% if you show this.");
+
+        db.insert(TABLE_BEACON, null, values1);
+        db.insert(TABLE_BEACON, null, values2);
+    }
+
     public Cursor getArtTableContents() {
         db = getReadableDatabase();
         cursor = db.rawQuery("SELECT * FROM " + TABLE_ART, null);
@@ -151,10 +209,48 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         db = getReadableDatabase();
         String[] selectionArgs = {""+artId};
         cursor = db.rawQuery("SELECT * FROM " + TABLE_ART + " WHERE _id = ?", selectionArgs);
-        cursor.moveToPosition(0);
-        for(String col:cursor.getColumnNames()) {
-            Log.d("Cursor details: ", col);
-        }
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getLatLong(int artId) {
+        db = getReadableDatabase();
+        String[] selectionArgs = {""+artId};
+        cursor = db.rawQuery("SELECT " + GEOFENCE_LAT +", " + GEOFENCE_LONG +
+                             " FROM " + TABLE_GEOFENCE +
+                             " WHERE _id = ?", selectionArgs);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getGeofences() {
+        db = getReadableDatabase();
+        cursor = db.rawQuery("SELECT * FROM " + TABLE_GEOFENCE + " JOIN " + TABLE_ART +
+                             " ON " + TABLE_GEOFENCE+"."+GEOFENCE_ART_ID +"="+ TABLE_ART+"."+ART_ID, null);
+        return cursor;
+    }
+
+    public Cursor getArtIdFromName(String artName) {
+        db = getReadableDatabase();
+        String[] selectionArgs = {artName};
+        cursor = db.rawQuery("SELECT " + ART_ID + " FROM " + TABLE_ART + " WHERE " + ART_NAME + " = ?", selectionArgs );
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getBeaconArtId(String[] args) {
+        db = getReadableDatabase();
+        cursor = db.rawQuery("SELECT " + BEACON_ART_ID + " FROM " + TABLE_BEACON +
+                             " WHERE " + BEACON_MAJOR + "= ? AND " + BEACON_MINOR + "=?", args);
+        cursor.moveToFirst();
+        return cursor;
+    }
+
+    public Cursor getBeaconAd(String[] args) {
+        db = getReadableDatabase();
+        cursor = db.rawQuery("SELECT " + BEACON_AD + " FROM " + TABLE_BEACON +
+                             " WHERE " + BEACON_MAJOR + "= ? AND " + BEACON_MINOR + "=?", args);
+        cursor.moveToFirst();
         return cursor;
     }
 }

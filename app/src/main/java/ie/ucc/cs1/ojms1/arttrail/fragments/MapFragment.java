@@ -3,14 +3,17 @@ package ie.ucc.cs1.ojms1.arttrail.fragments;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -19,16 +22,20 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import ie.ucc.cs1.ojms1.arttrail.helpers.DatabaseHandler;
 import ie.ucc.cs1.ojms1.arttrail.R;
+import ie.ucc.cs1.ojms1.arttrail.helpers.DirectionsAPIHelper;
 
 import static com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable;
 
@@ -42,6 +49,8 @@ public class MapFragment extends Fragment
     //Used for getting and displaying Google Map.
     private MapView mapView;
     private GoogleMap map;
+    private MarkerOptions userMarker;
+    private List<MarkerOptions> artDisplays;
 
     private Location currLocation;
 
@@ -51,11 +60,15 @@ public class MapFragment extends Fragment
     private GeofencingRequest mGeoRequest;
     private boolean requestingLocation;
     private PendingIntent mPendIntent;
+    private DirectionsAPIHelper directionsAPIHelper;
+    private int artId;
+    private DatabaseHandler db;
+    private Cursor cursor;
 
-    public static MapFragment newInstance(int position) {
+    public static MapFragment newInstance(int artId) {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
-        args.putInt("position", position);
+        args.putInt("ART_ID", artId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,6 +80,15 @@ public class MapFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(getArguments() != null) {
+            artId = getArguments().getInt("ART_ID");
+        }
+
+        directionsAPIHelper = new DirectionsAPIHelper();
+        db = new DatabaseHandler(getActivity().getApplicationContext(), null);
+        cursor = db.getGeofences();
+
         //google services
         int resultCode = isGooglePlayServicesAvailable(getActivity());
         if(resultCode == ConnectionResult.SUCCESS) {
@@ -78,8 +100,10 @@ public class MapFragment extends Fragment
             createLocationRequest(); //create location request
             createGeofenceRequest();// create geofence request
         } else {
-            Toast.makeText(getActivity(), "Not connected", Toast.LENGTH_SHORT).show();
+            GooglePlayServicesUtil.getErrorDialog(resultCode, getActivity(), resultCode);
+            Toast.makeText(getActivity().getApplicationContext(), "Not connected", Toast.LENGTH_SHORT).show();
         }
+        userMarker = new MarkerOptions().title("You are here");
     }
 
     @Override
@@ -96,6 +120,8 @@ public class MapFragment extends Fragment
         map.getUiSettings().setMyLocationButtonEnabled(false);
         //center camera on location
         MapsInitializer.initialize(this.getActivity());
+        artDisplays = createArtLocationMarkers();
+        displayArtLocations();
 
         return view;
     }
@@ -110,22 +136,14 @@ public class MapFragment extends Fragment
     public void onResume() {
         mapView.onResume();
         super.onResume();
-
-        if(mGoogleApiClient.isConnected() && requestingLocation) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
-                                                                     mLocRequest,
-                                                                     this);
-            requestingLocation = false;
-        } else {
-            //Toast.makeText(getActivity(), "Not requesting location", Toast.LENGTH_SHORT).show();
-        }
+        Toast.makeText(getActivity().getApplicationContext(), "On Resume", Toast.LENGTH_SHORT).show();
     }
     @Override
     public void onPause() {
         super.onPause();
         //remove updates to location listener when paused
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        requestingLocation = true;
+        cursor.close();
     }
 
     @Override
@@ -148,27 +166,27 @@ public class MapFragment extends Fragment
     //------OnMapLongClick Listener methods
     @Override
     public void onMapLongClick(LatLng latLng) {
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
-                mLocRequest,
-                this);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currLocation.getLatitude(),
+                                                                       currLocation.getLongitude()),
+                                                            15));
     }
 
     //Google Play Services ConnectionCallbacks and OnConnectionFailed Listener  methods
     @Override
     public void onConnected(Bundle bundle) {
+        //TODO: Fix null
         currLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if(currLocation != null) { //use previous location
-            Toast.makeText(getActivity(), "From Previous Location", Toast.LENGTH_SHORT).show();
-            myCameraUpdater(currLocation);
-            LatLng myLoc = new LatLng(currLocation.getLatitude(), currLocation.getLongitude());
-            map.addMarker(new MarkerOptions().position(myLoc).title("User Location"));
-        } else { //begin requesting updates
-            Toast.makeText(getActivity(), "Requesting Location Updates", Toast.LENGTH_SHORT).show();
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, //G.API client
+        if(currLocation != null) {
+            Log.d("Location", currLocation.toString());
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currLocation.getLatitude(),
+                                                                           currLocation.getLongitude()),
+                                                                15));
+        }
+
+        Toast.makeText(getActivity(), "Requesting Location Updates", Toast.LENGTH_SHORT).show();
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, //G.API client
                                                                      mLocRequest, //location request
                                                                      this); //listener
-            requestingLocation = false; //prevent any more request locations calls.
-        }
 
         Intent intent = new Intent("ie.ucc.cs1.ojms1.arttrail.GEOFENCE_NOTIFICATION");
         mPendIntent = PendingIntent.getBroadcast(getActivity().getApplicationContext(),
@@ -177,6 +195,9 @@ public class MapFragment extends Fragment
                                                  PendingIntent.FLAG_UPDATE_CURRENT);
         LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, mGeoRequest, mPendIntent)
                                       .setResultCallback(this);
+        if(artId != 0) {
+            createRoute();
+        }
     }
 
     @Override
@@ -193,98 +214,92 @@ public class MapFragment extends Fragment
     @Override
     public void onLocationChanged(Location location) {
         if(location != null) {
-            //crete LatLng and center map on location.
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
+            currLocation = location;
+            double latitude = currLocation.getLatitude();
+            double longitude = currLocation.getLongitude();
             LatLng myLatLng = new LatLng(latitude, longitude);
-            String markerTitle = latitude + ", " + longitude;
-            myCameraUpdater(location);
             map.clear();
-            map.addCircle(new CircleOptions().center(new LatLng(51.994762,-8.387729)) //home
-                    .radius(100)
-                    .visible(true));
-            map.addCircle(new CircleOptions().center(new LatLng(51.893040, -8.500363)) //wgb
-                    .radius(100)
-                    .visible(true));
-            map.addMarker(new MarkerOptions().position(myLatLng).title(markerTitle));
+            userMarker.position(myLatLng);
+            map.addMarker(userMarker);
+            displayArtLocations();
+            if(directionsAPIHelper.routeReady()) {
+                directionsAPIHelper.displayRoute();
+            }
         }
     }
 
     //---------My methods ----------------
-    private void myCameraUpdater(Location location) {
-        if(location != null) {
-            //call MapInitializer before doing any CameraFactory calls
-            //create LatLng from my location and center map on it.
-            LatLng myLoc = new LatLng(location.getLatitude(), location.getLongitude());
-            CameraUpdate camUpdate = CameraUpdateFactory.newLatLng(myLoc);
-            map.animateCamera(camUpdate);
-        }
-    }
-
     private void createLocationRequest() {
         mLocRequest = new LocationRequest();
-        mLocRequest.setInterval(2000) //5 seconds
-                   .setFastestInterval(1000) //2.5 seconds
+        mLocRequest.setInterval(2000)
+                   .setFastestInterval(1000)
                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     private void createGeofenceRequest() {
         GeofencingRequest.Builder geofenceBuilder = new GeofencingRequest.Builder();
-        Geofence geofence = new Geofence.Builder().setCircularRegion(51.893040, -8.500363, 100) //WGB UCC
-                                                  .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                                                  .setLoiteringDelay(5 * 1000) //5 seconds
-                                                  .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                                                                      Geofence.GEOFENCE_TRANSITION_DWELL)
-                                                  .setRequestId("WBG UCC")
-                                                  .build();
+        geofenceBuilder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER);
+        cursor.moveToPosition(-1);
+        while(cursor.moveToNext()) {
+            double latVal = cursor.getDouble(cursor.getColumnIndex(db.GEOFENCE_LAT));
+            double longVal = cursor.getDouble(cursor.getColumnIndex(db.GEOFENCE_LONG));
+            float radius = cursor.getFloat(cursor.getColumnIndex(db.GEOFENCE_RADIUS));
+            String artName = cursor.getString(cursor.getColumnIndex(db.ART_NAME));
+            Log.d("Contents", artName + ": (" + latVal + ", " + longVal + ", " + radius + ")" );
+            Geofence geofence = new Geofence.Builder().setCircularRegion(latVal, longVal, radius)
+                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                    .setLoiteringDelay(5 * 1000)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
 
-        Geofence geofence1 = new Geofence.Builder().setCircularRegion(51.994762,-8.387729, 100)//home
-                                                   .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                                                   .setLoiteringDelay(10 * 1000)
-                                                   .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                                                                       Geofence.GEOFENCE_TRANSITION_DWELL)
-                                                   .setRequestId("Home")
-                                                   .build();
+                    .setRequestId(artName)
+                    .build();
 
-        Geofence geofence2 = new Geofence.Builder().setCircularRegion(51.895520,-8.488968, 30)//UCC
-                                                   .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                                                   .setLoiteringDelay(10 * 1000)
-                                                   .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                                                           Geofence.GEOFENCE_TRANSITION_DWELL)
-                                                   .setRequestId("Main Gates UCC")
-                                                   .build();
-
-        Geofence geofence3 = new Geofence.Builder().setCircularRegion(51.897379,-8.465723, 30)//City Hall
-                                                   .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                                                   .setLoiteringDelay(10 * 1000)
-                                                   .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                                                           Geofence.GEOFENCE_TRANSITION_DWELL)
-                                                   .setRequestId("City Hall")
-                                                   .build();
-
-        Geofence geofence4 = new Geofence.Builder().setCircularRegion(51.901468,-8.463639, 100)//Church1
-                                                   .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                                                   .setLoiteringDelay(10 * 1000)
-                                                   .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                                                           Geofence.GEOFENCE_TRANSITION_DWELL)
-                                                   .setRequestId("St. Patrick's Church")
-                                                   .build();
-        Geofence geofence5 = new Geofence.Builder().setCircularRegion(51.932873,-8.399651, 100)//Church1
-                                                   .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                                                   .setLoiteringDelay(10 * 1000)
-                                                   .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                                                            Geofence.GEOFENCE_TRANSITION_DWELL)
-                                                   .setRequestId("St. Patrick's Church")
-                                                   .build();
-        geofenceBuilder.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER)
-                       .addGeofence(geofence)
-                       .addGeofence(geofence1)
-                       .addGeofence(geofence2)
-                       .addGeofence(geofence3)
-                       .addGeofence(geofence4)
-                       .addGeofence(geofence5);
+            geofenceBuilder.addGeofence(geofence);
+        }
         mGeoRequest = geofenceBuilder.build();
-        Toast.makeText(getActivity(), "Geofence made(s)", Toast.LENGTH_SHORT).show();
+    }
+
+    private List<MarkerOptions> createArtLocationMarkers() {
+        List<MarkerOptions> markers = new ArrayList<MarkerOptions>();
+        cursor.moveToPosition(-1);
+        while(cursor.moveToNext()) {
+            double latVal = cursor.getDouble(cursor.getColumnIndex(db.GEOFENCE_LAT));
+            double longVal = cursor.getDouble(cursor.getColumnIndex(db.GEOFENCE_LONG));
+            String artName = cursor.getString(cursor.getColumnIndex(db.ART_NAME));
+            String shopName = cursor.getString(cursor.getColumnIndex(db.ART_LOCATION));
+
+            MarkerOptions marker = new MarkerOptions().position(new LatLng(latVal, longVal))
+                                                      .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_flag))
+                                                      .title(artName)
+                                                      .snippet(shopName);
+            markers.add(marker);
+        }
+        cursor.close();
+        return markers;
+    }
+
+    private void displayArtLocations() {
+        for(MarkerOptions marker : artDisplays) {
+            map.addMarker(marker);
+        }
+    }
+
+    private void createRoute() {
+        Cursor cursor = db.getLatLong(artId);
+        //get destination lat and long coordinates
+        double latPos = cursor.getDouble(cursor.getColumnIndex(db.GEOFENCE_LAT));
+        double longPos = cursor.getDouble(cursor.getColumnIndex(db.GEOFENCE_LONG));
+
+        Log.d("LAT: ", "" + latPos);
+        Log.d("LONG: ", "" + longPos);
+
+        LatLng destination = new LatLng(latPos, longPos);
+        LatLng origin = new LatLng(currLocation.getLatitude(), currLocation.getLongitude());
+        directionsAPIHelper.setDestination(destination);
+        directionsAPIHelper.setOrigin(origin);
+        directionsAPIHelper.setMap(map);
+        //directionsAPIHelper = new DirectionsAPIHelper(origin, destination, map);
+        directionsAPIHelper.sendDirectionsAPIRequest(getActivity());
     }
 
     @Override

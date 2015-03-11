@@ -54,10 +54,14 @@ public class DirectionsAPIHelper {
         this.destination = location;
     }
 
+    public void setMap(GoogleMap map) {
+        this.map = map;
+    }
+
     public void sendDirectionsAPIRequest(final Context context) {
         queue = Volley.newRequestQueue(context);
         String url = DIRECTIONS_URL+"origin="+getOrigin()+"&"+
-                        "destination="+getDestination();
+                        "destination="+getDestination()+"&mode=walking";
         StringRequest directionsApiCall =
                 new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                     @Override
@@ -73,7 +77,11 @@ public class DirectionsAPIHelper {
         queue.add(directionsApiCall);
     }
 
-    private void displayRoute() {
+    public boolean routeReady() {
+        return (points != null ? true : false);
+    }
+
+    public void displayRoute() {
         if (points != null) {
             PolylineOptions polylineOps = new PolylineOptions();
             for(LatLng latLng : points) {
@@ -85,7 +93,6 @@ public class DirectionsAPIHelper {
     }
 
     public void parseResponse(String s) {
-        //TODO: Use GSON to decode JSON response and draw route to map.
         gson = new Gson();
         DirectionsAPIResponse route = gson.fromJson(s, DirectionsAPIResponse.class);
         String encodedOverviewPolyline = route.route[0].overview_polyline.points;
@@ -96,7 +103,6 @@ public class DirectionsAPIHelper {
 
     private List<LatLng> decodeOverviewPolyline(String encodedString) {
         List<LatLng> listOfPoints= new ArrayList<LatLng>();
-        //TODO:Decode
         int index = 0, len = encodedString.length();
         int lat = 0, lng = 0;
 

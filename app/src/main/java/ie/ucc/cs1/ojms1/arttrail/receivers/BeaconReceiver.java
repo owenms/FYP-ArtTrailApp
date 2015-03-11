@@ -20,8 +20,7 @@ public class BeaconReceiver extends BroadcastReceiver {
         Intent beaconService = new Intent(context, MyBeaconService.class);
         if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)){
             int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1);
-            if(state == BluetoothAdapter.STATE_TURNING_OFF ||
-               state == BluetoothAdapter.STATE_OFF) {
+            if(state == BluetoothAdapter.STATE_TURNING_OFF) {
                 Toast.makeText(context, "Stopping Service", Toast.LENGTH_SHORT).show();
                 context.stopService(beaconService);
             } else if(state == BluetoothAdapter.STATE_ON) {

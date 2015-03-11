@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import ie.ucc.cs1.ojms1.arttrail.DatabaseHandler;
+import ie.ucc.cs1.ojms1.arttrail.helpers.DatabaseHandler;
 import ie.ucc.cs1.ojms1.arttrail.R;
 
 /**
@@ -33,7 +33,6 @@ public class ArtDetailsFragment extends Fragment {
     private Button backButton;
     private Button routeButton;
     private ImageView artPicture;
-    private Cursor cursor;
     private DatabaseHandler db;
 
     private int artId;
@@ -90,6 +89,7 @@ public class ArtDetailsFragment extends Fragment {
         artInfo.setText(artInfoValue);
         artPicture.setImageResource(artPictureValue);
         setRouteButton();
+        cursor.close();
 
         return view;
     }
