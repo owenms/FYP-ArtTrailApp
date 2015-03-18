@@ -93,11 +93,11 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     private void insertSampleDataIntoArtTable(SQLiteDatabase db) {
         ContentValues values1 = new ContentValues();
         values1.put(ART_NAME, "Iron Giant");
-        values1.put(ART_ARTIST, "Owen McSweeney");
+        values1.put(ART_ARTIST, "Unknown person");
         values1.put(ART_INFO, "Created using GIMP 2.8. This piece is an example of Pixel Art.");
         values1.put(ART_PIC, R.drawable.iron_giant);
-        values1.put(ART_LOCATION, "Watergrasshill, Co. Cork");
-        values1.put(ART_LOC_INFO, "House where I live");
+        values1.put(ART_LOCATION, "Brookfield UCC, Co. Cork");
+        values1.put(ART_LOC_INFO, "UCC building.");
         values1.put(ART_VISITED, 0);
 
         ContentValues values2 = new ContentValues();
@@ -106,7 +106,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         values2.put(ART_INFO, "Portrait of the famous Mona Lisa. Note the distinct lack of a smile.");
         values2.put(ART_PIC, R.drawable.mona_lisa);
         values2.put(ART_LOCATION, "WGB UCC, Co. Cork");
-        values2.put(ART_LOC_INFO, "Western Gateway Building: home of all good maths and science courses");
+        values2.put(ART_LOC_INFO, "Western Gateway Building: computer science building.");
         values2.put(ART_VISITED, 0);
 
         ContentValues values3 = new ContentValues();
@@ -146,10 +146,10 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
     private void insertSampleDataIntoGeofenceTable(SQLiteDatabase db) {
         ContentValues values1 = new ContentValues();
-        values1.put(GEOFENCE_LAT, 51.994762);
-        values1.put(GEOFENCE_LONG, -8.387729);
-        values1.put(GEOFENCE_RADIUS, 100);
-        values1.put(GEOFENCE_ART_ID, 1); //Home
+        values1.put(GEOFENCE_LAT, 51.891242);
+        values1.put(GEOFENCE_LONG, -8.500687);
+        values1.put(GEOFENCE_RADIUS, 50);
+        values1.put(GEOFENCE_ART_ID, 1); //Brookfield UCC
 
         ContentValues values2 = new ContentValues();
         values2.put(GEOFENCE_LAT, 51.893040);
@@ -186,12 +186,12 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         ContentValues values1 = new ContentValues();
         values1.put(BEACON_MAJOR, 11492); //blueberry pie
         values1.put(BEACON_MINOR, 17761); //blueberry pie
-        values1.put(BEACON_ART_ID, 1);
+        values1.put(BEACON_ART_ID, 2);
 
         ContentValues values2 = new ContentValues();
         values2.put(BEACON_MAJOR, 24770); //mint cocktail
         values2.put(BEACON_MINOR, 63730); //mint cocktail
-        values2.put(BEACON_ART_ID, 1);
+        values2.put(BEACON_ART_ID, 2);
         values2.put(BEACON_AD, "Your next purchase can be reduced by 20% if you show this.");
 
         db.insert(TABLE_BEACON, null, values1);

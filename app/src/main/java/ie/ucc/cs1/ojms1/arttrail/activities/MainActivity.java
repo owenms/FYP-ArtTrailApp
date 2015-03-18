@@ -27,6 +27,7 @@ import ie.ucc.cs1.ojms1.arttrail.fragments.ArtListFragment;
 import ie.ucc.cs1.ojms1.arttrail.fragments.MapFragment;
 import ie.ucc.cs1.ojms1.arttrail.fragments.NavigationDrawerFragment;
 import ie.ucc.cs1.ojms1.arttrail.R;
+import ie.ucc.cs1.ojms1.arttrail.services.MyBeaconService;
 
 
 public class MainActivity extends Activity
@@ -79,8 +80,10 @@ public class MainActivity extends Activity
 
         Intent intent = getIntent();
         int id = intent.getIntExtra("NOTIFICATION_TYPE", 0);
+        intent.removeExtra("NOTIFICATION_TYPE");
         if(id == 1) { //Beacon intent
             int artId = intent.getIntExtra("ART_ID", 0);
+            intent.removeExtra("ART_ID");
             if(artId != 0) {
                 mFragment = ArtDetailsFragment.newInstance(artId);
                 fragmentManager = getFragmentManager();
@@ -91,12 +94,13 @@ public class MainActivity extends Activity
             } else {
                 Intent beaconAd = new Intent(this, BeaconAdActivity.class);
                 String ad = intent.getStringExtra("SHOP_AD");
+                intent.removeExtra("SHOP_AD");
                 beaconAd.putExtra("BEACON_AD", ad);
 
                 startActivity(beaconAd);
             }
         } else if(id == 2) { //Geofence intent
-            Toast.makeText(this, "Geofence Intent", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Geofence Intent", Toast.LENGTH_SHORT).show();
             int artId = intent.getIntExtra("ART_ID", 0);
             if(artId != 0) {
                 mFragment = ArtDetailsFragment.newInstance(artId);
@@ -109,9 +113,8 @@ public class MainActivity extends Activity
                     .addToBackStack(null)
                     .commit();
         } else {
-            Toast.makeText(this, "No Intent", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "No Intent", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void showNetworkWarningDialog(Context context, String messageTitle, String message) {
@@ -156,22 +159,21 @@ public class MainActivity extends Activity
                     break;
                 case 1: //create map fragment
                     mFragment = MapFragment.newInstance(0);
-                    Toast.makeText(getApplicationContext(), "Map pressed", Toast.LENGTH_SHORT)
-                            .show();
+                    //Toast.makeText(getApplicationContext(), "Map pressed", Toast.LENGTH_SHORT)
+                    //        .show();
                     mTitle = getString(R.string.title_section2);
                     break;
                 case 2: //create artlist fragment
                     mFragment = ArtListFragment.newInstance(0);
-                    Toast.makeText(getApplicationContext(), "Art pressed", Toast.LENGTH_LONG)
-                            .show();
+                    //Toast.makeText(getApplicationContext(), "Art pressed", Toast.LENGTH_LONG)
+                    //        .show();
                     mTitle = getString(R.string.title_section3);
                     break;
-                case 3: //create stats fragment
-                    Toast.makeText(getApplicationContext(), "Stats called", Toast.LENGTH_LONG)
-                            .show();
-                    mTitle = getString(R.string.title_section4);
-
-                    break;
+//                case 3: //create stats fragment
+//                    Toast.makeText(getApplicationContext(), "Stats called", Toast.LENGTH_LONG)
+//                            .show();
+//                    mTitle = getString(R.string.title_section4);
+//                    break;
             }
             if (mFragment != null) {
                 fragmentManager = getFragmentManager();
@@ -200,9 +202,9 @@ public class MainActivity extends Activity
             case 3:
                 mTitle = getString(R.string.title_section3);
                 break;
-            case 4:
-                mTitle = getString(R.string.title_section4);
-                break;
+//            case 4:
+//                mTitle = getString(R.string.title_section4);
+//                break;
         }
     }
 

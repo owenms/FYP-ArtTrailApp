@@ -47,16 +47,18 @@ public class NotificationHandler {
         int id = (int) System.currentTimeMillis();
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra("NOTIFICATION_TYPE", BEACON_ID);
+        int pendingId = 0;
         if(artId != 0) {
             intent.putExtra("ART_ID", artId);
-
+            pendingId = BEACON_ART_ID;
             Log.d("ART_DISPLAY", ""+artId);
         } else {
             message = "You are inside the shop. Click here for any shop promotions";
             intent.putExtra("SHOP_AD", ad);
+            pendingId = BEACON_SHOP_ID;
             Log.d("SHOP AD", ad);
         }
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (id-1), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, pendingId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         long[] vibratePat = {0, 100, 100, 100, 100, 500};
 
         builder.setTicker(BEACON_TICKER)
@@ -73,13 +75,62 @@ public class NotificationHandler {
         Toast.makeText(context, "Notification sent", Toast.LENGTH_SHORT).show();
     }
 
+    public void createBeaconShopNotification(String ad) {
+        int id = (int) System.currentTimeMillis();
+        Intent shopIntent = new Intent(context, MainActivity.class);
+        shopIntent.putExtra("NOTIFICATION_TYPE", BEACON_ID);
+        shopIntent.putExtra("SHOP_AD", ad);
+        String message = "You are inside the shop. Click here for any shop promotions";
+        int pendingId = BEACON_SHOP_ID;
+        Log.d("SHOP AD", ad);
+        PendingIntent shopPendingIntent = PendingIntent.getActivity(context, pendingId, shopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        long[] vibratePat = {0, 100, 100, 100, 100, 500};
+
+        builder.setTicker(BEACON_TICKER)
+                .setContentTitle(BEACON_TITLE)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setWhen(System.currentTimeMillis())
+                .setContentIntent(shopPendingIntent)
+                .setContentText(message)
+                .setVibrate(vibratePat)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_SOUND);
+
+        nm.notify(id, builder.build());
+        Toast.makeText(context, "Notification sent", Toast.LENGTH_SHORT).show();
+    }
+
+    public void createBeaconArtNotification(int artId) {
+        String message = "You are near an art exhibit. \nClick here for details of the art.";
+        int id = (int) System.currentTimeMillis();
+        Intent artIntent = new Intent(context, MainActivity.class);
+        artIntent.putExtra("NOTIFICATION_TYPE", BEACON_ID);
+        artIntent.putExtra("ART_ID", artId);
+        int pendingId = BEACON_ART_ID;
+        Log.d("ART_DISPLAY", ""+artId);
+        PendingIntent artPendingIntent = PendingIntent.getActivity(context, pendingId, artIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        long[] vibratePat = {0, 100, 100, 100, 100, 500};
+
+        builder.setTicker(BEACON_TICKER)
+                .setContentTitle(BEACON_TITLE)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setWhen(System.currentTimeMillis())
+                .setContentIntent(artPendingIntent)
+                .setContentText(message)
+                .setVibrate(vibratePat)
+                .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_SOUND);
+
+        nm.notify(id, builder.build());
+        Toast.makeText(context, "Shop Notification sent", Toast.LENGTH_SHORT).show();
+    }
+
     public void createGeofenceNotification(int artId, String requestId, String message) {
         int id = (int) System.currentTimeMillis();
         Intent viewMapIntent = new Intent(context, MainActivity.class);
         viewMapIntent.putExtra("NOTIFICATION_TYPE", GEOFENCE_ID);
         PendingIntent viewMapPendingIntent = PendingIntent.getActivity(context, GEOFENCE_MAP_ID, viewMapIntent,
                                                                        PendingIntent.FLAG_UPDATE_CURRENT);
-
         Intent viewArtDetailsIntent = new Intent(context, MainActivity.class);
         viewArtDetailsIntent.putExtra("NOTIFICATION_TYPE", GEOFENCE_ID);
         viewArtDetailsIntent.putExtra("ART_ID", artId);
@@ -100,7 +151,7 @@ public class NotificationHandler {
                 .addAction(R.drawable.ic_info, "Art Details", viewArtDetailsPendingIntent);
 
         nm.notify(id, builder.build());
-        Toast.makeText(context, "Notification sent", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Art Notification sent", Toast.LENGTH_SHORT).show();
     }
 
     public void createErrorNotification() {

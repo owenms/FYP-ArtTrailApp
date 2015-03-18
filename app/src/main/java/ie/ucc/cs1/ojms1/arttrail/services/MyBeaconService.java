@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
@@ -39,6 +38,7 @@ public class MyBeaconService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        setMonitoring();
         beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
             @Override
             public void onServiceReady() {
@@ -50,12 +50,11 @@ public class MyBeaconService extends Service {
                 }
             }
         });
-        beginMonitoring();
         Log.d("SERVICE", "Monitoring started");
         return START_STICKY;
     }
 
-    private void beginMonitoring() {
+    private void setMonitoring() {
         beaconManager.setBackgroundScanPeriod(1000, 1000);
         beaconManager.setMonitoringListener(new BeaconManager.MonitoringListener() {
             @Override
@@ -67,13 +66,15 @@ public class MyBeaconService extends Service {
                     Log.d("ART_DISPLAY", "You are near art");
                     Cursor cursor = db.getBeaconArtId(selectionArgs);
                     int artId = cursor.getInt(cursor.getColumnIndex(db.BEACON_ART_ID));
-                    notificationHandler.createBeaconNotification(artId, null);
+                    //notificationHandler.createBeaconNotification(artId, null);
+                    notificationHandler.createBeaconArtNotification(artId);
                     cursor.close();
                 } else if(region.getIdentifier().equals("Shop Beacon")) {
                     Log.d("SHOP_BEACON", "You are in shop");
                     Cursor cursor = db.getBeaconAd(selectionArgs);
                     String ad = cursor.getString(cursor.getColumnIndex(db.BEACON_AD));
-                    notificationHandler.createBeaconNotification(0, ad);
+                    //notificationHandler.createBeaconNotification(0, ad);
+                    notificationHandler.createBeaconShopNotification(ad);
                     cursor.close();
                 }
             }

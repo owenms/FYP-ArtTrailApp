@@ -31,10 +31,10 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
         if(event.hasError()) {
             //TODO Handle error
-            Toast.makeText(context, "No events triggered", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "No events triggered", Toast.LENGTH_SHORT).show();
             notificationHandler.createErrorNotification();
         } else {
-            Toast.makeText(context, "Geofence triggered", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Geofence triggered", Toast.LENGTH_SHORT).show();
             int transType = event.getGeofenceTransition();
             if(transType == Geofence.GEOFENCE_TRANSITION_ENTER) {
                 List<Geofence> geofenceTriggered = event.getTriggeringGeofences();

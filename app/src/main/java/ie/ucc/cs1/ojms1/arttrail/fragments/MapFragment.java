@@ -136,7 +136,7 @@ public class MapFragment extends Fragment
     public void onResume() {
         mapView.onResume();
         super.onResume();
-        Toast.makeText(getActivity().getApplicationContext(), "On Resume", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity().getApplicationContext(), "On Resume", Toast.LENGTH_SHORT).show();
     }
     @Override
     public void onPause() {
