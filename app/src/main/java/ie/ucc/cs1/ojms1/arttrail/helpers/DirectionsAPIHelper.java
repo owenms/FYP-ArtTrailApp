@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Class used to send and receive Directions API requests and responses in order
+ * to draw routes on the map.
  * Created by owen on 08/02/2015.
  */
 public class DirectionsAPIHelper {
@@ -31,56 +33,98 @@ public class DirectionsAPIHelper {
     public List<LatLng> points;
     private GoogleMap map;
 
+    /**
+     * Empty constructor
+     */
     public DirectionsAPIHelper() {}
+
+    /**
+     * Constructor
+     * @param origin Location origin
+     * @param destination Location destination
+     * @param map Map to draw route on
+     */
     public DirectionsAPIHelper(final LatLng origin, final LatLng destination, GoogleMap map) {
         this.origin = origin;
         this.destination = destination;
         this.map = map;
     }
 
+    /**
+     * Get destination
+     * @return destination in String form
+     */
     public String getDestination() {
         return "" + destination.latitude + "," + destination.longitude;
     }
 
+    /**
+     * Get origin
+     * @return origin in String form
+     */
     public String getOrigin() {
         return ""+origin.latitude+","+origin.longitude;
     }
 
+    /**
+     * Set the origin
+     * @param location location to be origin
+     */
     public void setOrigin(LatLng location) {
             this.origin = location;
     }
 
+    /**
+     * Set destination
+     * @param location location to be destination
+     */
     public void setDestination(LatLng location) {
         this.destination = location;
     }
 
+    /**
+     * Set the map
+     * @param map map to draw route on
+     */
     public void setMap(GoogleMap map) {
         this.map = map;
     }
 
+    /**
+     * Send a Directions API request
+     * @param context application context
+     */
     public void sendDirectionsAPIRequest(final Context context) {
+        //create queue and request and parse the response
         queue = Volley.newRequestQueue(context);
         String url = DIRECTIONS_URL+"origin="+getOrigin()+"&"+
                         "destination="+getDestination()+"&mode=walking";
-        StringRequest directionsApiCall =
-                new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String s) {
-                        parseResponse(s);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("VOLLEY ERROR", error.toString());
-            }
+        StringRequest directionsApiCall = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String s) {
+                            parseResponse(s);
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d("VOLLEY ERROR", error.toString());
+                        }
         });
         queue.add(directionsApiCall);
     }
 
+    /**
+     * If there are location points then the route is ready to be drawn to the map
+     * @return state of route's readiness.
+     */
     public boolean routeReady() {
-        return (points != null ? true : false);
+        return points != null;
     }
 
+    /**
+     * Draw the route to the map
+     */
     public void displayRoute() {
         if (points != null) {
             PolylineOptions polylineOps = new PolylineOptions();
@@ -92,6 +136,10 @@ public class DirectionsAPIHelper {
         }
     }
 
+    /**
+     * Parse the JSON response from the Directions API
+     * @param s JSON string to parse
+     */
     public void parseResponse(String s) {
         gson = new Gson();
         DirectionsAPIResponse route = gson.fromJson(s, DirectionsAPIResponse.class);
@@ -101,8 +149,14 @@ public class DirectionsAPIHelper {
         displayRoute();
     }
 
+    /**
+     * Decodes the encoded polyline into list of points. Courtesy of
+     * http://jeffreysambells.com/2010/05/27/decoding-polylines-from-google-maps-direction-api-with-java
+     * @param encodedString The polyline to decode
+     * @return list of LatLng point to draw to map
+     */
     private List<LatLng> decodeOverviewPolyline(String encodedString) {
-        List<LatLng> listOfPoints= new ArrayList<LatLng>();
+        List<LatLng> listOfPoints = new ArrayList<LatLng>();
         int index = 0, len = encodedString.length();
         int lat = 0, lng = 0;
 

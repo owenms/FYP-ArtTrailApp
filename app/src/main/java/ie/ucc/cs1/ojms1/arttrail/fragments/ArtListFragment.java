@@ -13,10 +13,18 @@ import ie.ucc.cs1.ojms1.arttrail.adapters.ArtListViewAdapter;
 import ie.ucc.cs1.ojms1.arttrail.helpers.DatabaseHandler;
 import ie.ucc.cs1.ojms1.arttrail.R;
 
+/**
+ * Displays all of the art pieces in a list
+ */
 public class ArtListFragment extends Fragment {
 
     private DatabaseHandler db;
 
+    /**
+     * Creates fragment with argument
+     * @param position argument
+     * @return fragment with argument
+     */
     public static ArtListFragment newInstance(int position) {
         ArtListFragment fragment = new ArtListFragment();
         Bundle args = new Bundle();
@@ -25,6 +33,9 @@ public class ArtListFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Empty constructor - use newInstance instead.
+     */
     public ArtListFragment() {
         // Required empty public constructor
     }
@@ -39,13 +50,16 @@ public class ArtListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_art, container, false);
 
+        //populate the list
         db = new DatabaseHandler(getActivity().getApplicationContext(), null);
         Cursor cursor = db.getArtTableContents();
-        ArtListViewAdapter myAdapter = new ArtListViewAdapter(getActivity().getApplicationContext(), cursor);
+        ArtListViewAdapter myAdapter = new ArtListViewAdapter(getActivity().getApplicationContext(),
+                                       cursor);
 
         ListView artListView = (ListView) view.findViewById(R.id.artListView);
         artListView.setAdapter(myAdapter);
 
+        //open ArtDetailsFragment when a user clicks on an element of the list
         artListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

@@ -9,6 +9,9 @@ import android.util.Log;
 
 import ie.ucc.cs1.ojms1.arttrail.R;
 
+/**
+ * Class to create a sample database to use on open day
+ */
 public class DatabaseHandler extends SQLiteOpenHelper{
 
     private static final int DATABASE_VERSION = 1;
@@ -184,13 +187,13 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
     private void insertSampleDataIntoBeaconTable(SQLiteDatabase db) {
         ContentValues values1 = new ContentValues();
-        values1.put(BEACON_MAJOR, 11492); //blueberry pie
-        values1.put(BEACON_MINOR, 17761); //blueberry pie
+        values1.put(BEACON_MAJOR, 11492); //blueberry pie beacon
+        values1.put(BEACON_MINOR, 17761); //blueberry pie beacon
         values1.put(BEACON_ART_ID, 2);
 
         ContentValues values2 = new ContentValues();
-        values2.put(BEACON_MAJOR, 24770); //mint cocktail
-        values2.put(BEACON_MINOR, 63730); //mint cocktail
+        values2.put(BEACON_MAJOR, 24770); //mint cocktail beacon
+        values2.put(BEACON_MINOR, 63730); //mint cocktail beacon
         values2.put(BEACON_ART_ID, 2);
         values2.put(BEACON_AD, "Your next purchase can be reduced by 20% if you show this.");
 
@@ -226,14 +229,16 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     public Cursor getGeofences() {
         db = getReadableDatabase();
         cursor = db.rawQuery("SELECT * FROM " + TABLE_GEOFENCE + " JOIN " + TABLE_ART +
-                             " ON " + TABLE_GEOFENCE+"."+GEOFENCE_ART_ID +"="+ TABLE_ART+"."+ART_ID, null);
+                             " ON " + TABLE_GEOFENCE+"."+GEOFENCE_ART_ID +"="+ TABLE_ART+"."+ART_ID,
+                             null);
         return cursor;
     }
 
     public Cursor getArtIdFromName(String artName) {
         db = getReadableDatabase();
         String[] selectionArgs = {artName};
-        cursor = db.rawQuery("SELECT " + ART_ID + " FROM " + TABLE_ART + " WHERE " + ART_NAME + " = ?", selectionArgs );
+        cursor = db.rawQuery("SELECT " + ART_ID + " FROM " + TABLE_ART +
+                             " WHERE " + ART_NAME + " = ?", selectionArgs );
         cursor.moveToFirst();
         return cursor;
     }

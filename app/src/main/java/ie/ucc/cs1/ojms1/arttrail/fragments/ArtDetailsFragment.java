@@ -17,12 +17,11 @@ import ie.ucc.cs1.ojms1.arttrail.helpers.DatabaseHandler;
 import ie.ucc.cs1.ojms1.arttrail.R;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link ArtDetailsFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Display an art exhibit's details
  */
 public class ArtDetailsFragment extends Fragment {
 
+    //fragment argument that will have artId value
     private static final String ART_PARAM = "ART_NAME";
 
     private TextView artName;
@@ -37,6 +36,11 @@ public class ArtDetailsFragment extends Fragment {
 
     private int artId;
 
+    /**
+     * Create fragment with argument
+     * @param artName argument to create fragment with
+     * @return fragment with an argument
+     */
     public static ArtDetailsFragment newInstance(int artName) {
         ArtDetailsFragment fragment = new ArtDetailsFragment();
         Bundle args = new Bundle();
@@ -45,6 +49,9 @@ public class ArtDetailsFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Empty constructor - use newInstance instead
+     */
     public ArtDetailsFragment() {
         // Required empty public constructor
     }
@@ -73,6 +80,13 @@ public class ArtDetailsFragment extends Fragment {
         backButton = (Button) view.findViewById(R.id.backButton);
         artPicture = (ImageView) view.findViewById(R.id.image);
 
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().getFragmentManager().popBackStack();
+            }
+        });
+
         Cursor cursor = db.getArtDetails(artId);
 
         String artNameValue = cursor.getString(cursor.getColumnIndex(db.ART_NAME));
@@ -94,6 +108,9 @@ public class ArtDetailsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Create the route button and handle click event
+     */
     private void setRouteButton() {
         routeButton.setOnClickListener(new View.OnClickListener() {
             @Override

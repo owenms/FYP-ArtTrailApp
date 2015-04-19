@@ -3,17 +3,12 @@
 
     <string name="app_name">ArtTrail</string>
     <string name="title_section1">Home</string>
-    <string name="title_section2">Map</string>
-    <string name="title_section3">Art</string>
-    <!--<string name="title_section4">Statistics</string>-->
+    <string name="title_section2">View Map</string>
+    <string name="title_section3">View Art</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_map">MapActivity</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="beacon_activity">Beacon Activity</string>
     <string name="title_activity_beacon_ad">BeaconAd</string>
 
 </resources>

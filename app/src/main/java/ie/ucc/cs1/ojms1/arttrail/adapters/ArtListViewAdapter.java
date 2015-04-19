@@ -13,6 +13,7 @@ import ie.ucc.cs1.ojms1.arttrail.R;
 import ie.ucc.cs1.ojms1.arttrail.helpers.DatabaseHandler;
 
 /**
+ * Create the Art list fragment's layout and data from database content
  * Created by owen on 26/02/2015.
  */
 public class ArtListViewAdapter extends CursorAdapter {
@@ -24,8 +25,7 @@ public class ArtListViewAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
-        View view = layoutInflater.inflate(R.layout.art_content, parent, false);
-        return view;
+        return layoutInflater.inflate(R.layout.art_content, parent, false);
     }
 
     @Override

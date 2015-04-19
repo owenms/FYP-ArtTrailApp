@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Art Trail App"
+                android:text="Mobile Art Trail"
                 android:id="@+id/textView"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
@@ -41,20 +41,34 @@
                 android:layout_height="wrap_content"
                 android:text="View Map"
                 android:id="@+id/mapButton"
-                android:layout_marginLeft="83dp"
                 android:layout_alignTop="@+id/artButton"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                android:layout_alignLeft="@+id/textView8"
+                android:layout_alignStart="@+id/textView8"
+                android:layout_marginBottom="40dp"
+                android:layout_marginLeft="50dp" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="View Art"
                 android:id="@+id/artButton"
-                android:layout_toEndOf="@+id/mapButton"
-                android:layout_marginBottom="39dp"
+                android:layout_marginBottom="40dp"
                 android:layout_alignParentBottom="true"
-                android:layout_toRightOf="@+id/mapButton" />
+                android:layout_alignRight="@+id/textView8"
+                android:layout_alignEnd="@+id/textView8"
+                android:layout_marginRight="50dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome to the Mobile Art Trail app!\n\nClick on the left icon in the Action Bar to display and hide the navigation drawer.\nAlternatively, slide your finger from the left of the screen to the right side of the screen to open the navigation drawer.\n\nChoose 'View Map' and 'View Art' from below or the navigation drawer to see the map and all the art pieces in the event.\n\nHave fun and good luck!"
+                android:id="@+id/textView8"
+                android:layout_below="@+id/textView"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_above="@+id/mapButton"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp" />
 
         </RelativeLayout>
     </FrameLayout>

@@ -14,20 +14,16 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
+import ie.ucc.cs1.ojms1.arttrail.R;
 import ie.ucc.cs1.ojms1.arttrail.fragments.ArtDetailsFragment;
 import ie.ucc.cs1.ojms1.arttrail.fragments.ArtListFragment;
 import ie.ucc.cs1.ojms1.arttrail.fragments.MapFragment;
 import ie.ucc.cs1.ojms1.arttrail.fragments.NavigationDrawerFragment;
-import ie.ucc.cs1.ojms1.arttrail.R;
-import ie.ucc.cs1.ojms1.arttrail.services.MyBeaconService;
 
 
 public class MainActivity extends Activity
@@ -68,7 +64,6 @@ public class MainActivity extends Activity
         artButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                 startActivity(beaconActivity);
                 onNavigationDrawerItemSelected(2);
             }
         });
@@ -78,6 +73,7 @@ public class MainActivity extends Activity
                                         (DrawerLayout) findViewById(R.id.drawer_layout));
         navDrawerFix = true;
 
+        //handle opening correct fragment due to a notification
         Intent intent = getIntent();
         int id = intent.getIntExtra("NOTIFICATION_TYPE", 0);
         intent.removeExtra("NOTIFICATION_TYPE");
@@ -100,20 +96,18 @@ public class MainActivity extends Activity
                 startActivity(beaconAd);
             }
         } else if(id == 2) { //Geofence intent
-            //Toast.makeText(this, "Geofence Intent", Toast.LENGTH_SHORT).show();
             int artId = intent.getIntExtra("ART_ID", 0);
             if(artId != 0) {
                 mFragment = ArtDetailsFragment.newInstance(artId);
             } else {
                 mFragment = new MapFragment();
             }
+
             fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
                     .add(R.id.container, mFragment)
                     .addToBackStack(null)
                     .commit();
-        } else {
-            //Toast.makeText(this, "No Intent", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -140,7 +134,8 @@ public class MainActivity extends Activity
                     "Please have an internet connection before using this application");
         } else {
             BluetoothManager bManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-            BluetoothAdapter bluetoothAdapter = bManager.getAdapter(); //TODO: Remove warning here
+            //TODO: Only used for API 18 and higher. Find way to include down to API 14
+            BluetoothAdapter bluetoothAdapter = bManager.getAdapter();
             if(bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 int requestId = 1;
@@ -159,21 +154,12 @@ public class MainActivity extends Activity
                     break;
                 case 1: //create map fragment
                     mFragment = MapFragment.newInstance(0);
-                    //Toast.makeText(getApplicationContext(), "Map pressed", Toast.LENGTH_SHORT)
-                    //        .show();
                     mTitle = getString(R.string.title_section2);
                     break;
                 case 2: //create artlist fragment
                     mFragment = ArtListFragment.newInstance(0);
-                    //Toast.makeText(getApplicationContext(), "Art pressed", Toast.LENGTH_LONG)
-                    //        .show();
                     mTitle = getString(R.string.title_section3);
                     break;
-//                case 3: //create stats fragment
-//                    Toast.makeText(getApplicationContext(), "Stats called", Toast.LENGTH_LONG)
-//                            .show();
-//                    mTitle = getString(R.string.title_section4);
-//                    break;
             }
             if (mFragment != null) {
                 fragmentManager = getFragmentManager();
@@ -202,17 +188,17 @@ public class MainActivity extends Activity
             case 3:
                 mTitle = getString(R.string.title_section3);
                 break;
-//            case 4:
-//                mTitle = getString(R.string.title_section4);
-//                break;
         }
     }
 
     public void restoreActionBar() {
         ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
+        if (actionBar != null) {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setTitle(mTitle);
+        }
+
     }
 
 
@@ -243,45 +229,4 @@ public class MainActivity extends Activity
 
         return super.onOptionsItemSelected(item);
     }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
-    }
-
 }

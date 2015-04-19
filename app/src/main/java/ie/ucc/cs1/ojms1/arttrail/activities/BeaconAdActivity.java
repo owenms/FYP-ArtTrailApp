@@ -14,6 +14,9 @@ import com.google.android.gms.maps.model.LatLng;
 
 import ie.ucc.cs1.ojms1.arttrail.R;
 
+/**
+ * Display the shop promotion to users if they go inside the shop
+ */
 public class BeaconAdActivity extends Activity {
 
     @Override

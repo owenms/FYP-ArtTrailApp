@@ -1,11 +1,6 @@
 package ie.ucc.cs1.ojms1.arttrail.activities;
 
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.view.Menu;
@@ -24,20 +19,27 @@ import java.util.List;
 
 import ie.ucc.cs1.ojms1.arttrail.R;
 
-
+/**
+ * Class used to test beacon ranging.
+ */
 public class BeaconActivity extends Activity {
 
-    private TextView blueberryPie;
-    private TextView mintCocktail;
-    private TextView icyMarshmallow;
-    private TextView beaconCount;
     private Button rangingButton;
-    private Button monitoringButton;
     private Boolean isRanging = false;
-    private Boolean isMonitoring = false;
+
+    private TextView bpRSSI;
+    private TextView bpDist;
+    private TextView bpProx;
+
+    private TextView imRSSI;
+    private TextView imDist;
+    private TextView imProx;
+
+    private int imCount = 0;
+    private int bpCount = 0;
 
     public static final String MY_UUID = "B9407F30-F5F8-466E-AFF9-25556B57FE6D";
-    private Region allBeacons = new Region("MyBeacons", MY_UUID, null, null);
+    private Region allBeacons = new Region("All", MY_UUID, null, null);
     private BeaconManager beaconManager;
 
 
@@ -46,12 +48,29 @@ public class BeaconActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_beacon);
 
-        blueberryPie = (TextView) findViewById(R.id.blueberryPie);
-        mintCocktail = (TextView) findViewById(R.id.mintCocktail);
-        icyMarshmallow = (TextView) findViewById(R.id.icyMarshmallow);
-        beaconCount = (TextView) findViewById(R.id.beaconCount);
-        rangingButton = (Button) findViewById(R.id.rangingButton);
-        monitoringButton = (Button) findViewById(R.id.monitoringButton);
+        rangingButton = (Button) findViewById(R.id.rangeButton);
+        Button clrButton = (Button) findViewById(R.id.clrButton);
+
+        bpRSSI = (TextView) findViewById(R.id.bpRSSI);
+        bpDist = (TextView) findViewById(R.id.bpDist);
+        bpProx = (TextView) findViewById(R.id.bpProx);
+
+        imRSSI = (TextView) findViewById(R.id.imRSSI);
+        imDist = (TextView) findViewById(R.id.imDist);
+        imProx = (TextView) findViewById(R.id.imProx);
+
+        clrButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imProx.setText("");
+                imDist.setText("");
+                imRSSI.setText("");
+
+                bpProx.setText("");
+                bpDist.setText("");
+                bpRSSI.setText("");
+            }
+        });
 
         rangingButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,7 +80,9 @@ public class BeaconActivity extends Activity {
                     rangingButton.setText("Stop Ranging");
                     try {
                         beaconManager.startRanging(allBeacons);
-                        Toast.makeText(getApplicationContext(), "Started Ranging", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),
+                                       "Started Ranging",
+                                       Toast.LENGTH_SHORT).show();
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
@@ -70,7 +91,9 @@ public class BeaconActivity extends Activity {
                     rangingButton.setText("Start Ranging");
                     try {
                         beaconManager.stopRanging(allBeacons);
-                        Toast.makeText(getApplicationContext(), "Stopped Ranging", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),
+                                       "Stopped Ranging",
+                                       Toast.LENGTH_SHORT).show();
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
@@ -78,85 +101,33 @@ public class BeaconActivity extends Activity {
             }
         });
 
-//        monitoringButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(!isMonitoring) {
-//                    isMonitoring = true;
-//                    monitoringButton.setText("Stop Monitoring");
-//                    try {
-//                        beaconManager.startMonitoring(allBeacons);
-//                        Toast.makeText(getApplicationContext(), "Started Monitoring", Toast.LENGTH_SHORT).show();
-//                    } catch (RemoteException e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    isMonitoring = false;
-//                    monitoringButton.setText("Start Monitoring");
-//                    try {
-//                        beaconManager.stopMonitoring(allBeacons);
-//                        Toast.makeText(getApplicationContext(), "Stopped Monitoring", Toast.LENGTH_SHORT).show();
-//                    } catch (RemoteException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        });
-
         beaconManager = new BeaconManager(getApplicationContext());
         beaconManager.setForegroundScanPeriod(1000, 0);
-        beaconManager.setBackgroundScanPeriod(5000, 5000);
-//        beaconManager.setMonitoringListener(new BeaconManager.MonitoringListener() {
-//            @Override
-//            public void onEnteredRegion(Region region, List<Beacon> beacons) {
-//                sendMessage("Entered Beacon Region.", "Beacon region entered.", "You have just entered the region. Please enjoy your stay.");
-//            }
-//
-//            @Override
-//            public void onExitedRegion(Region region) {
-//                sendMessage("Left Beacon Region.", "Region has been left.", "You have just left the region. Thank you and come again.");
-//            }
-//        });
         beaconManager.setRangingListener(new BeaconManager.RangingListener() {
             @Override
             public void onBeaconsDiscovered(Region region, List<Beacon> beacons) {
-                int numBeaconsFound = 0;
-                for(Beacon beacon : beacons) {
-                    numBeaconsFound++;
-                    int major = beacon.getMajor();
-                    int minor = beacon.getMinor();
-                    double accuracy = Utils.computeAccuracy(beacon);
-                    if(major == 11492 && minor == 17761) {
-                        blueberryPie.setText("Dist (m): " + accuracy);
-                    } else if(major == 24770 && minor == 63730) {
-                        mintCocktail.setText("Dist (m): " + accuracy);
-                    } else if(major == 36992 && minor == 9494) {
-                        icyMarshmallow.setText("Dist (m): " + accuracy);
+                for(Beacon b : beacons) {
+                    if(b.getMajor() == 11492) {
+                        int rssi = b.getRssi();
+                        double dist = Utils.computeAccuracy(b);
+                        Utils.Proximity prox = Utils.computeProximity(b);
+
+                        bpProx.setText(prox.name());
+                        bpDist.setText("" + dist + " //// " + ++bpCount);
+                        bpRSSI.setText("" + rssi);
+                    } else if(b.getMajor() == 36992) {
+                        int rssi = b.getRssi();
+                        double dist = Utils.computeAccuracy(b);
+                        Utils.Proximity prox = Utils.computeProximity(b);
+
+                        imProx.setText(prox.name());
+                        imDist.setText("" + dist + " //// " + ++imCount);
+                        imRSSI.setText("" + rssi);
                     }
                 }
-                beaconCount.setText(""+numBeaconsFound);
             }
         });
     }
-
-    private void sendMessage(String title, String tickerText, String message) {
-        long[] vibratePat = {0,100,100,100,100,500};
-        Notification.Builder builder =
-                new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle(title)
-                        .setTicker(tickerText)
-                        .setContentText(message)
-                        .setAutoCancel(true)
-                        .setVibrate(vibratePat)
-                        .setDefaults(Notification.DEFAULT_SOUND);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        int id = (int) System.currentTimeMillis();
-        notificationManager.notify(id, builder.getNotification());
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -186,7 +157,9 @@ public class BeaconActivity extends Activity {
         beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
             @Override
             public void onServiceReady() {
-                Toast.makeText(getApplicationContext(), "Ready when you are!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),
+                               "Ready when you are!",
+                               Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -206,7 +179,6 @@ public class BeaconActivity extends Activity {
         super.onStop();
         try {
             beaconManager.stopRanging(allBeacons);
-            beaconManager.stopMonitoring(allBeacons);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
